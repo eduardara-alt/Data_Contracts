@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: "Pedidos normalizados desde la fuente raw"
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: order_id
+        data_type: int
+        description: "Clave primaria del pedido"
+        constraints:
+          - type: not_null
+      - name: customer_id
+        data_type: int
+        description: "Referencia al cliente"
+      - name: order_total
+        data_type: numeric(38,2)
+        description: "Importe total del pedido"
+      - name: created_at
+        data_type: timestamp
+        description: "Fecha de creación"
