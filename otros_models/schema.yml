@@ -1,0 +1,819 @@
+version: 2
+
+# SOURCES
+sources:
+  - name: stackoverflow
+    database: bigquery-public-data
+    schema: stackoverflow
+    tables:
+      - name: posts_questions
+        description: "All questions from StackOverflow, raw source"
+
+        config:
+          tags: ["source", "questions", "raw"]
+
+        columns:
+          - name: id
+            description: "Unique identifier of the question"
+            tests:
+              - not_null
+              - unique
+
+          - name: owner_user_id
+            description: "ID of the user who posted the question"
+            tests:
+              - not_null
+
+          - name: title
+            description: "Title of the question"
+
+          - name: body
+            description: "Body content of the question"
+
+          - name: accepted_answer_id
+            description: "ID of the accepted answer"
+
+          - name: answer_count
+            description: "Number of answers to the question"
+
+          - name: comment_count
+            description: "Number of comments on the question"
+
+          - name: community_owned_date
+            description: "Timestamp when the question became community-owned"
+
+          - name: creation_date
+            description: "Timestamp when the question was created"
+
+          - name: favorite_count
+            description: "Number of times the question was favorited"
+
+          - name: last_activity_date
+            description: "Timestamp of the last activity on this question"
+
+          - name: post_type_id
+            description: "Type of post (question type)"
+
+          - name: score
+            description: "Score of the question (upvotes minus downvotes)"
+
+          - name: tags
+            description: "Tags associated with the question"
+
+          - name: last_edit_date
+            description: "Timestamp of the last edit"
+
+          - name: last_editor_display_name
+            description: "Display name of the last editor"
+
+          - name: last_editor_user_id
+            description: "User ID of the last editor"
+
+          - name: owner_display_name
+            description: "Display name of the user who posted the question"
+
+          - name: view_count
+            description: "Number of times the question was viewed"
+
+      - name: posts_answers
+        description: "All answers from StackOverflow, raw source"
+
+        config:
+          tags: ["source", "answers", "raw"]
+
+        columns:
+          - name: id
+            description: "Unique identifier of the answer"
+            tests:
+              - not_null
+
+          - name: parent_id
+            description: "ID of the parent question"
+            tests:
+              - not_null
+
+          - name: owner_user_id
+            description: "ID of the user who posted the answer"
+
+          - name: owner_display_name
+            description: "Display name of the user who posted the answer"
+
+          - name: title
+            description: "Title of the answer"
+
+          - name: body
+            description: "Body content of the answer"
+
+          - name: accepted_answer_id
+            description: "ID of the accepted answer"
+
+          - name: answer_count
+            description: "Number of answers (if applicable)"
+
+          - name: comment_count
+            description: "Number of comments on the answer"
+
+          - name: favorite_count
+            description: "Number of times this answer was favorited"
+
+          - name: last_activity_date
+            description: "Timestamp of the last activity on this answer"
+
+          - name: creation_date
+            description: "Timestamp when the answer was created"
+
+          - name: last_edit_date
+            description: "Timestamp of the last edit"
+
+          - name: last_editor_display_name
+            description: "Display name of the last editor"
+
+          - name: last_editor_user_id
+            description: "User ID of the last editor"
+
+          - name: community_owned_date
+            description: "Timestamp when the answer became community-owned"
+
+          - name: post_type_id
+            description: "Type of post (answer type)"
+
+          - name: score
+            description: "Score of the answer (upvotes minus downvotes)"
+
+          - name: tags
+            description: "Tags associated with the answer"
+
+          - name: view_count
+            description: "Number of times the answer was viewed"
+
+      - name: users
+        description: "All StackOverflow users, raw source"
+
+        config:
+          tags: ["source", "users", "raw"]
+
+        columns:
+          - name: id
+            description: "Unique identifier of the user"
+            tests:
+              - not_null
+              - unique
+
+          - name: display_name
+            description: "Public display name of the user"
+
+          - name: location
+            description: "User provided location"
+
+          - name: reputation
+            description: "User reputation score"
+
+          - name: about_me
+            description: "User profile description"
+
+          - name: up_votes
+            description: "Number of upvotes cast by the user"
+
+          - name: down_votes
+            description: "Number of downvotes cast by the user"
+
+          - name: views
+            description: "Number of profile views"
+
+          - name: profile_image_url
+            description: "URL of the user profile image"
+
+          - name: website_url
+            description: "User personal website URL"
+
+          - name: age
+            description: "Age of the user"
+
+          - name: creation_date
+            description: "Timestamp when the account was created"
+
+          - name: last_access_date
+            description: "Timestamp of the last account access"
+
+      - name: votes
+        description: "Votes on questions and answers, raw source"
+
+        config:
+          tags: ["source", "votes", "raw"]
+
+        columns:
+          - name: id
+            description: "Unique identifier of the vote"
+            tests:
+              - not_null
+
+          - name: post_id
+            description: "ID of the post (question or answer) that received the vote"
+
+          - name: vote_type_id
+            description: "Type of vote (e.g., upvote, downvote, etc.)"
+
+          - name: creation_date
+            description: "Timestamp when the vote was created"
+
+# MODELS
+models:
+  # Jobs
+  - name: stg_posts_questions
+    description: "Staging table copying questions from StackOverflow"
+    config:
+      alias: posts_questions
+      meta:
+        domain: "answers"
+        layer: "silver"
+        owner: "data-team"
+        version: "1.0"
+      tags: ["job", "silver", "answers", "stats"]
+    columns:
+      - name: id
+        description: "Unique identifier of the question"
+        tests:
+          - not_null
+          - unique
+      - name: owner_user_id
+        description: "ID of the user who posted the question"
+      - name: title
+        description: "Title of the question"
+      - name: body
+        description: "Body content of the question"
+      - name: accepted_answer_id
+        description: "ID of the accepted answer"
+      - name: answer_count
+        description: "Number of answers to the question"
+      - name: comment_count
+        description: "Number of comments on the question"
+      - name: community_owned_date
+        description: "Timestamp when the question became community-owned"
+      - name: creation_date
+        description: "Timestamp when the question was created"
+      - name: favorite_count
+        description: "Number of times the question was favorited"
+      - name: last_activity_date
+        description: "Timestamp of the last activity on this question"
+      - name: post_type_id
+        description: "Type of post (question type)"
+      - name: score
+        description: "Score of the question (upvotes minus downvotes)"
+      - name: tags
+        description: "Tags associated with the question"
+      - name: last_edit_date
+        description: "Timestamp of the last edit"
+      - name: last_editor_display_name
+        description: "Display name of the last editor"
+      - name: last_editor_user_id
+        description: "User ID of the last editor"
+      - name: owner_display_name
+        description: "Display name of the user who posted the question"
+      - name: view_count
+        description: "Number of times the question was viewed"
+
+  - name: stg_posts_answers
+    description: "Staging table copying answers from StackOverflow"
+    config:
+      alias: posts_answers
+      meta:
+        domain: "answers"
+        layer: "silver"
+        owner: "data-team"
+        version: "1.0"
+      tags: ["job", "silver", "answers", "stats"]
+    columns:
+      - name: id
+        description: "Unique identifier of the answer"
+        tests:
+          - not_null
+      - name: parent_id
+        description: "ID of the parent question"
+      - name: owner_user_id
+        description: "ID of the user who posted the answer"
+      - name: owner_display_name
+        description: "Display name of the user who posted the answer"
+      - name: title
+        description: "Title of the answer"
+      - name: body
+        description: "Body content of the answer"
+      - name: accepted_answer_id
+        description: "ID of the accepted answer"
+      - name: answer_count
+        description: "Number of answers (if applicable)"
+      - name: comment_count
+        description: "Number of comments on the answer"
+      - name: favorite_count
+        description: "Number of times this answer was favorited"
+      - name: last_activity_date
+        description: "Timestamp of the last activity on this answer"
+      - name: creation_date
+        description: "Timestamp when the answer was created"
+      - name: last_edit_date
+        description: "Timestamp of the last edit"
+      - name: last_editor_display_name
+        description: "Display name of the last editor"
+      - name: last_editor_user_id
+        description: "User ID of the last editor"
+      - name: community_owned_date
+        description: "Timestamp when the answer became community-owned"
+      - name: post_type_id
+        description: "Type of post (answer type)"
+      - name: score
+        description: "Score of the answer (upvotes minus downvotes)"
+      - name: tags
+        description: "Tags associated with the answer"
+      - name: view_count
+        description: "Number of times the answer was viewed"
+
+  - name: stg_users
+    description: "Staging table copying users from StackOverflow"
+    config:
+      alias: users
+      meta:
+        domain: "answers"
+        layer: "silver"
+        owner: "data-team"
+        version: "1.0"
+      tags: ["job", "silver", "answers", "stats"]
+    columns:
+      - name: id
+        description: "Unique identifier of the user"
+        tests:
+          - not_null
+          - unique
+      - name: display_name
+        description: "Public display name of the user"
+      - name: location
+        description: "User provided location"
+      - name: reputation
+        description: "User reputation score"
+      - name: about_me
+        description: "User profile description"
+      - name: up_votes
+        description: "Number of upvotes cast by the user"
+      - name: down_votes
+        description: "Number of downvotes cast by the user"
+      - name: views
+        description: "Number of profile views"
+      - name: profile_image_url
+        description: "URL of the user profile image"
+      - name: website_url
+        description: "User personal website URL"
+      - name: age
+        description: "Age of the user"
+      - name: creation_date
+        description: "Timestamp when the account was created"
+      - name: last_access_date
+        description: "Timestamp of the last account access"
+
+  - name: stg_votes
+    description: "Staging table copying votes from StackOverflow"
+    config:
+      alias: votes
+      meta:
+        domain: "answers"
+        layer: "silver"
+        owner: "data-team"
+        version: "1.0"
+      tags: ["job", "silver", "answers", "stats"]
+    columns:
+      - name: id
+        description: "Unique identifier of the vote"
+        tests:
+          - not_null
+      - name: post_id
+        description: "ID of the post (question or answer) that received the vote"
+      - name: vote_type_id
+        description: "Type of vote (e.g., upvote, downvote, etc.)"
+      - name: creation_date
+        description: "Timestamp when the vote was created"
+  
+  - name: answer_stats
+    description: "Job: calculates upvote and downvote counts for each answer"
+
+    config:
+      alias: answer_stats
+      meta:
+        domain: "answers"
+        layer: "silver"
+        owner: "data-team"
+        version: "1.0"
+      tags: ["job", "silver", "answers", "stats"]
+
+    columns:
+      - name: id
+        description: "ID de la respuesta"
+
+      - name: owner_user_id
+        description: "ID del usuario que respondió"
+
+      - name: upvote_count
+        description: "Número total de votos positivos"
+
+      - name: downvote_count
+        description: "Número total de votos negativos"
+
+  - name: filtered_users
+    description: "Job: filters users related to filtered questions and answers (incremental)"
+
+    config:
+      alias: filtered_users
+      meta:
+        domain: "users"
+        layer: "silver"
+        owner: "data-team"
+        version: "1.0"
+      tags: ["job", "silver", "users", "filtered"]
+
+    columns:
+      - name: about_me
+        description: "Descripción del usuario"
+
+      - name: creation_date
+        description: "Fecha de creación de la cuenta"
+
+      - name: location
+        description: "Ubicación del usuario"
+
+      - name: up_votes
+        description: "Número de votos positivos"
+
+      - name: views
+        description: "Número de vistas del perfil"
+
+      - name: website_url
+        description: "URL del sitio web del usuario"
+
+      - name: id
+        description: "ID del usuario"
+
+      - name: display_name
+        description: "Nombre visible del usuario"
+
+      - name: age
+        description: "Edad del usuario"
+
+      - name: last_access_date
+        description: "Última fecha de acceso"
+
+      - name: reputation
+        description: "Reputación del usuario"
+
+      - name: down_votes
+        description: "Número de votos negativos"
+
+      - name: profile_image_url
+        description: "URL de la imagen de perfil"
+
+  - name: filtered_questions
+    description: "Dataset: questions tagged 'etl', creation date > 2021-01-01"
+
+    config:
+      alias: filtered_questions
+      meta:
+        owner: "data-team"
+        layer: "silver"
+        domain: "questions"
+      tags: ["dataset", "silver", "questions"]
+
+    columns:
+      - name: id
+        description: "ID del post"
+        tests:
+          - not_null:
+              arguments:
+                name: test_filtered_questions_not_null_id
+                meta:
+                  owner: "data-team"
+                  layer: "silver"
+                  domain: "questions"
+                  tags: ["test_job", "quality"]
+          - unique:
+              arguments:
+                name: test_filtered_questions_unique_id
+                meta:
+                  owner: "data-team"
+                  layer: "silver"
+                  domain: "questions"
+                  tags: ["test_job", "quality"]
+
+      - name: owner_user_id
+        description: "ID del usuario propietario"
+        tests:
+          - not_null:
+              arguments:
+                name: test_filtered_questions_not_null_owner_user_id
+                meta:
+                  owner: "data-team"
+                  layer: "silver"
+                  domain: "questions"
+                  tags: ["test_job", "quality"]
+
+      - name: creation_date
+        description: "Fecha de creación"
+        tests:
+          - not_null:
+              arguments:
+                name: test_filtered_questions_not_null_creation_date
+                meta:
+                  owner: "data-team"
+                  layer: "silver"
+                  domain: "questions"
+                  tags: ["test_job", "quality"]
+
+      - name: answer_count
+        description: "Número de respuestas"
+
+      - name: parent_id
+        description: "ID del post padre"
+
+      - name: comment_count
+        description: "Número de comentarios"
+
+      - name: community_owned_date
+        description: "Fecha de propiedad comunitaria"
+
+      - name: post_type_id
+        description: "Tipo de post"
+
+      - name: score
+        description: "Puntuación del post"
+
+      - name: tags
+        description: "Etiquetas del post"
+
+      - name: favorite_count
+        description: "Número de favoritos"
+
+      - name: last_activity_date
+        description: "Fecha de última actividad"
+
+      - name: last_edit_date
+        description: "Fecha de última edición"
+
+      - name: title
+        description: "Título del post"
+
+      - name: last_editor_display_name
+        description: "Nombre del último editor"
+
+      - name: last_editor_user_id
+        description: "ID del último editor"
+
+      - name: owner_display_name
+        description: "Nombre del propietario"
+
+      - name: view_count
+        description: "Número de vistas"
+
+      - name: body
+        description: "Contenido del post"
+
+      - name: accepted_answer_id
+        description: "ID de la respuesta aceptada"
+
+  - name: filtered_answers
+    description: "Dataset: answers related to filtered questions"
+
+    config:
+      alias: filtered_answers
+      meta:
+        domain: "answers"
+        layer: "silver"
+        owner: "data-team"
+        version: "1.0"
+      tags: ["dataset", "silver", "answers", "filtered"]
+
+    columns:
+      - name: id
+        description: "ID del post"
+        tests:
+          - unique:
+              arguments: {}
+          - not_null:
+              arguments: {}
+
+      - name: parent_id
+        description: "ID del post padre"
+        tests:
+          - not_null:
+              arguments: {}
+          - relationships:
+              arguments:
+                to: ref('filtered_questions')
+                field: id
+
+      - name: owner_user_id
+        description: "ID del usuario propietario"
+        tests:
+          - not_null:
+              arguments: {}
+          - relationships:
+              arguments:
+                to: ref('filtered_users')
+                field: id
+
+      - name: creation_date
+        description: "Fecha de creación"
+        tests:
+          - not_null:
+              arguments: {}
+
+      - name: comment_count
+        description: "Número de comentarios"
+
+      - name: view_count
+        description: "Número de vistas"
+
+      - name: post_type_id
+        description: "Tipo de post"
+
+      - name: accepted_answer_id
+        description: "ID de la respuesta aceptada"
+
+      - name: body
+        description: "Contenido del post"
+
+      - name: favorite_count
+        description: "Número de favoritos"
+
+      - name: last_activity_date
+        description: "Fecha de última actividad"
+
+      - name: last_editor_user_id
+        description: "ID del último editor"
+
+      - name: last_editor_display_name
+        description: "Nombre del último editor"
+
+      - name: title
+        description: "Título del post"
+
+      - name: owner_display_name
+        description: "Nombre del propietario"
+
+      - name: tags
+        description: "Etiquetas del post"
+
+      - name: answer_count
+        description: "Número de respuestas"
+
+      - name: community_owned_date
+        description: "Fecha de propiedad comunitaria"
+
+      - name: last_edit_date
+        description: "Fecha de última edición"
+
+      - name: score
+        description: "Puntuación del post"
+
+  - name: filtered_votes
+    description: "Dataset: votes related to filtered questions and answers"
+
+    config:
+      alias: filtered_votes
+      meta:
+        domain: "votes"
+        layer: "silver"
+        owner: "data-team"
+        version: "1.0"
+      tags: ["dataset", "silver", "votes", "filtered"]
+
+    columns:
+      - name: id
+        description: "ID del voto"
+
+      - name: post_id
+        description: "ID del post al que pertenece el voto"
+
+      - name: creation_date
+        description: "Fecha de creación del voto"
+
+      - name: vote_type_id
+        description: "Tipo de voto"
+
+  - name: question_stats
+    description: "Dataset: aggregated statistics for filtered questions including votes"
+
+    config:
+      alias: question_stats
+      meta:
+        domain: "questions"
+        layer: "gold"
+        owner: "data-team"
+        version: "1.0"
+      tags: ["dataset", "gold", "questions", "stats", "view"]
+
+    columns:
+      - name: id
+        description: "ID de la pregunta"
+
+      - name: owner_user_id
+        description: "ID del usuario propietario"
+
+      - name: accepted_answer_id
+        description: "ID de la respuesta aceptada"
+
+      - name: answer_count
+        description: "Número total de respuestas"
+
+      - name: upvote_count
+        description: "Número total de votos positivos"
+
+      - name: downvote_count
+        description: "Número total de votos negativos"
+
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "total_questions >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "total_votes >= 0"
+
+  - name: summary_daily
+    description: "Dataset: aggregates daily counts of questions, answers, askers, and answerers"
+
+    config:
+      alias: summary_daily
+      meta:
+        domain: "summary"
+        layer: "gold"
+        owner: "data-team"
+        version: "1.0"
+      tags: ["dataset", "gold", "summary", "daily", "view"]
+
+    columns:
+      - name: date
+        description: "Fecha de agregación diaria"
+
+      - name: num_questions
+        description: "Número total de preguntas ese día"
+
+      - name: num_answers
+        description: "Número total de respuestas ese día"
+
+      - name: num_askers
+        description: "Número de usuarios que hicieron preguntas ese día"
+
+      - name: num_answerers
+        description: "Número de usuarios que respondieron preguntas ese día"
+
+  - name: user_stats
+    description: "Dataset: aggregates statistics per user (questions, answers, votes)"
+
+    config:
+      alias: user_stats
+      meta:
+        domain: "users"
+        layer: "gold"
+        owner: "data-team"
+        version: "1.0"
+      tags: ["dataset", "gold", "users", "stats", "view"]
+
+    columns:
+      - name: id
+        description: "ID del usuario"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('filtered_users')
+              field: id
+
+      - name: display_name
+        description: "Nombre visible del usuario"
+
+      - name: creation_date
+        description: "Fecha de creación de la cuenta"
+
+      - name: last_access_date
+        description: "Última fecha de acceso"
+
+      - name: profile_image_url
+        description: "URL de la imagen de perfil"
+
+      - name: questions_posted
+        description: "Número de preguntas publicadas"
+
+      - name: questions_posted_upvotes
+        description: "Total de votos positivos en preguntas publicadas"
+
+      - name: questions_posted_downvotes
+        description: "Total de votos negativos en preguntas publicadas"
+
+      - name: answers_inspired
+        description: "Total de respuestas inspiradas en las preguntas del usuario"
+
+      - name: answers_posted
+        description: "Número de respuestas publicadas"
+
+      - name: answers_posted_upvotes
+        description: "Total de votos positivos en respuestas publicadas"
+
+      - name: answers_posted_downvotes
+        description: "Total de votos negativos en respuestas publicadas"
+
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "answers_posted >= 0"
+

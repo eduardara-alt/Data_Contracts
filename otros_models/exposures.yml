@@ -1,0 +1,21 @@
+version: 2
+
+exposures:
+  - name: executive_dashboard
+    label: "Executive Dashboard"
+    type: dashboard
+    maturity: high
+    description: >
+      Dashboard ejecutivo que muestra métricas clave
+      de preguntas, usuarios y actividad diaria.
+
+    url: "https://looker.company.com/dashboards/executive"
+
+    depends_on:
+      - ref('question_stats')
+      - ref('summary_daily')
+      - ref('user_stats')
+
+    owner:
+      name: analytics-team
+      email: analytics@company.com

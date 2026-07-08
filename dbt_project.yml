@@ -1,0 +1,63 @@
+name: answers_questions_votes
+version: 1.0.0
+config-version: 2
+
+profile: stackostudy
+
+# Paths
+model-paths: ["models"]
+analysis-paths: ["analysis"]
+test-paths: ["tests"]
+seed-paths: ["data"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Configuración global de modelos
+models:
+  answers_questions_votes:
+    +materialized: view
+
+    +persist_docs:
+      relation: true
+      columns: true
+
+    +meta:
+      owner: "data-team"
+      steward: "data-governance"
+      domain: "answers_questions_votes"
+      layer: "silver"
+      criticality: "high"
+      sla_hours: 2
+      pii: false
+      data_product: "stack_overflow_metrics"
+      cost_center: "analytics"
+      maturity: "beta"
+
+    +tags:
+      - answers_questions_votes
+      - silver
+      - analytics
+
+    +on_schema_change: "sync_all_columns"
+
+    +dbt-osmosis: "_schema.yml"
+
+# Snapshots
+snapshots:
+  answers_questions_votes:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: updated_at
+    +check_cols: all
+
+# Seeds
+seeds:
+  answers_questions_votes:
+    +persist_docs:
+      relation: true
+      columns: true

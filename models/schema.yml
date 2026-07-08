@@ -1,0 +1,166 @@
+version: 2
+sources:
+  - name: stackoverflow
+    database: bigquery-public-data
+    schema: stackoverflow
+    tables:
+      - name: posts_questions
+        description: All questions from StackOverflow, raw source
+        config:
+          tags: [source, questions, raw]
+        columns:
+          - name: id
+            description: Unique identifier of the question
+            tests:
+              - not_null
+              - unique
+            data_type: INT64
+          - name: title
+            description: Title of the question
+            data_type: STRING
+          - name: body
+            description: Body content of the question
+            data_type: STRING
+          - name: accepted_answer_id
+            description: ID of the accepted answer
+            data_type: INT64
+          - name: answer_count
+            description: Number of answers to the question
+            data_type: INT64
+          - name: comment_count
+            description: Number of comments on the question
+            data_type: INT64
+          - name: community_owned_date
+            description: Timestamp when the question became community-owned
+            data_type: TIMESTAMP
+          - name: creation_date
+            description: Timestamp when the question was created
+            data_type: TIMESTAMP
+          - name: favorite_count
+            description: Number of times the question was favorited
+            data_type: INT64
+          - name: last_activity_date
+            description: Timestamp of the last activity on this question
+            data_type: TIMESTAMP
+          - name: last_edit_date
+            description: Timestamp of the last edit
+            data_type: TIMESTAMP
+          - name: last_editor_display_name
+            description: Display name of the last editor
+            data_type: STRING
+          - name: last_editor_user_id
+            description: User ID of the last editor
+            data_type: INT64
+          - name: owner_display_name
+            description: Display name of the user who posted the question
+            data_type: STRING
+          - name: owner_user_id
+            description: ID of the user who posted the question
+            tests:
+              - not_null
+            data_type: INT64
+          - name: parent_id
+            data_type: STRING
+          - name: post_type_id
+            description: Type of post (question type)
+            data_type: INT64
+          - name: score
+            description: Score of the question (upvotes minus downvotes)
+            data_type: INT64
+          - name: tags
+            description: Tags associated with the question
+            data_type: STRING
+          - name: view_count
+            description: Number of times the question was viewed
+            data_type: INT64
+      - name: votes
+        description: All votes from StackOverflow, raw source
+        config:
+          tags: [source, votes, raw]
+        columns:
+          - name: id
+            description: Unique identifier of the vote
+            tests:
+              - not_null
+              - unique
+            data_type: INT64
+          - name: creation_date
+            description: Timestamp when the vote was created
+            data_type: TIMESTAMP
+          - name: post_id
+            description: ID of the post that was voted on
+            tests:
+              - not_null
+            data_type: INT64
+          - name: vote_type_id
+            description: Type of vote (e.g. 2=upvote, 3=downvote)
+            data_type: INT64
+      - name: posts_answers
+        description: All answers from StackOverflow, raw source
+        config:
+          tags: [source, answers, raw]
+        columns:
+          - name: id
+            description: Unique identifier of the answer
+            tests:
+              - not_null
+            data_type: INT64
+          - name: title
+            description: Title of the answer
+            data_type: STRING
+          - name: body
+            description: Body content of the answer
+            data_type: STRING
+          - name: accepted_answer_id
+            description: ID of the accepted answer
+            data_type: STRING
+          - name: answer_count
+            description: Number of answers (if applicable)
+            data_type: STRING
+          - name: comment_count
+            description: Number of comments on the answer
+            data_type: INT64
+          - name: community_owned_date
+            description: Timestamp when the answer became community-owned
+            data_type: TIMESTAMP
+          - name: creation_date
+            description: Timestamp when the answer was created
+            data_type: TIMESTAMP
+          - name: favorite_count
+            description: Number of times this answer was favorited
+            data_type: STRING
+          - name: last_activity_date
+            description: Timestamp of the last activity on this answer
+            data_type: TIMESTAMP
+          - name: last_edit_date
+            description: Timestamp of the last edit
+            data_type: TIMESTAMP
+          - name: last_editor_display_name
+            description: Display name of the last editor
+            data_type: STRING
+          - name: last_editor_user_id
+            description: User ID of the last editor
+            data_type: INT64
+          - name: owner_display_name
+            description: Display name of the user who posted the answer
+            data_type: STRING
+          - name: owner_user_id
+            description: ID of the user who posted the answer
+            data_type: INT64
+          - name: parent_id
+            description: ID of the parent question
+            tests:
+              - not_null
+            data_type: INT64
+          - name: post_type_id
+            description: Type of post (answer type)
+            data_type: INT64
+          - name: score
+            description: Score of the answer (upvotes minus downvotes)
+            data_type: INT64
+          - name: tags
+            description: Tags associated with the answer
+            data_type: STRING
+          - name: view_count
+            description: Number of times the answer was viewed
+            data_type: STRING

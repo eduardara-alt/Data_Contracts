@@ -1,0 +1,4 @@
+-- {% macro emit_tags(model) %}
+--  {{ log('Emitiendo OpenLineage metadata para ' ~ model.name, info=True) }}
+--  {{ openlineage.emit_dataset_metadata(add_openlineage_metadata()) }}
+--{% endmacro %}
