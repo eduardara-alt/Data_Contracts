@@ -378,8 +378,7 @@ models:
         description: Tipo de voto
         data_type: INT64
   - name: summary_daily
-    description: 'Dataset: daily aggregated summary of questions, answers and unique
-      askers/answerers'
+    description: 'Dataset: daily aggregated summary of questions, answers and unique askers/answerers'
     config:
       alias: summary_daily
       meta:
@@ -408,8 +407,7 @@ models:
         description: Número de usuarios que respondieron preguntas ese día
         data_type: INT64
   - name: question_stats
-    description: 'Dataset: aggregated statistics for filtered questions including
-      votes'
+    description: 'Dataset: aggregated statistics for filtered questions including votes'
     config:
       alias: question_stats
       meta:
