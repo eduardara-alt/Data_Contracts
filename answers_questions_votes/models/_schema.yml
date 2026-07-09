@@ -140,7 +140,7 @@ models:
         data_type: STRING
       - name: accepted_answer_id
         description: ID of the accepted answer
-        data_type: INT64
+        data_type: STRING
       - name: owner_user_id
         description: ID of the user who posted the answer
         data_type: INT64
