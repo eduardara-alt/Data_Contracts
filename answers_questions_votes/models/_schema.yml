@@ -155,6 +155,8 @@ models:
         tests:
           - not_null
         data_type: INT64
+        constraints:
+          - type: not_null
       - name: score
         description: Score of the answer (upvotes minus downvotes)
         data_type: INT64
